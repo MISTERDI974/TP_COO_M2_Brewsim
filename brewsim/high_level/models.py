@@ -17,6 +17,9 @@ class Machine(models.Model):
     def __str__(self):
         return self.nom
 
+    def cost(self):
+        return self.prix
+
 
 class Ingredient(models.Model):
     nom = models.CharField(max_length=100)
@@ -50,8 +53,8 @@ class QuantiteIngredient(models.Model):
     def __str__(self):
         return f"{self.ingredient.nom}" " : " f"{self.quantite}" "Kg"
 
-    # def cost(self, departement):
-    #    quantite*prix_departement
+    def cost(self, departement):
+        return self.quantite * self.ingredient.prix_set.get(departement.numero).prix
 
 
 class Usine(models.Model):
@@ -65,7 +68,15 @@ class Usine(models.Model):
         return "Usine " f"{self.departement}"
 
     def cost(self):
-        return Usine.taille * Usine.departement.prix_m2 + Usine.machine.prix
+        prixTotalMachine = 0
+        prixStock = 0
+        for mach in self.machine:
+            prixTotalMachine = prixTotalMachine + mach.cost()
+
+        for ingre in self.stock:
+            prixStock = prixStock + ingre.cost(self.departement)
+
+        return self.taille * self.departement.prix_m2 + prixStock + prixTotalMachine
 
 
 class Prix(models.Model):
