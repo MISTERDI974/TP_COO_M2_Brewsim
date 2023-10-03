@@ -28,24 +28,6 @@ class Ingredient(models.Model):
         return self.nom
 
 
-class Action(models.Model):
-    machine = models.ForeignKey(Machine, on_delete=models.PROTECT)
-    commande = models.CharField(max_length=100)
-    durée = models.IntegerField()
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return "Action : " f"{self.commande}"
-
-
-class Recette(models.Model):
-    nom = models.CharField(max_length=100)
-    action = models.ForeignKey(Action, on_delete=models.PROTECT)
-
-    def __str__(self):
-        return self.nom
-
-
 class QuantiteIngredient(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.PROTECT)
     quantite = models.IntegerField()
@@ -58,6 +40,24 @@ class QuantiteIngredient(models.Model):
             self.quantite
             * self.ingredient.prix_set.get(departement__numero=dep.numero).prix
         )
+
+
+class Action(models.Model):
+    machine = models.ForeignKey(Machine, on_delete=models.PROTECT)
+    commande = models.CharField(max_length=100)
+    durée = models.IntegerField()
+    ingredient = models.ManyToManyField(QuantiteIngredient)
+
+    def __str__(self):
+        return "Action : " f"{self.commande}"
+
+
+class Recette(models.Model):
+    nom = models.CharField(max_length=100)
+    action = models.ForeignKey(Action, on_delete=models.PROTECT)
+
+    def __str__(self):
+        return self.nom
 
 
 class Usine(models.Model):
@@ -80,6 +80,11 @@ class Usine(models.Model):
             prixStock = prixStock + ingre.cost(self.departement)
 
         return self.taille * self.departement.prix_m2 + prixStock + prixTotalMachine
+
+    def Achat_auto(self):
+        for ingre in self.recette.action.ingredient:
+            if self.stock.ingredient.quantite < self.recette.action.ingredient.quantite:
+                self.stock.add(self.recette.action.ingre)
 
 
 class Prix(models.Model):
