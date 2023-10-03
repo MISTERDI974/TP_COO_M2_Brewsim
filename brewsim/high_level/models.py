@@ -48,10 +48,11 @@ class QuantiteIngredient(models.Model):
     quantite = models.IntegerField()
 
     def __str__(self):
-        return f"{self.ingredient.nom}" " : "f"{self.quantite}" "Kg"
+        return f"{self.ingredient.nom}" " : " f"{self.quantite}" "Kg"
 
-    #def cost(self, departement):
+    # def cost(self, departement):
     #    quantite*prix_departement
+
 
 class Usine(models.Model):
     departement = models.ForeignKey(Departement, on_delete=models.PROTECT)
@@ -63,10 +64,8 @@ class Usine(models.Model):
     def __str__(self):
         return "Usine " f"{self.departement}"
 
-    def cost(self) :
-        return taille*departement.prix_m2 + machine.prix
-
-
+    def cost(self):
+        return Usine.taille * Usine.departement.prix_m2 + Usine.machine.prix
 
 
 class Prix(models.Model):
@@ -76,4 +75,4 @@ class Prix(models.Model):
 
     def __str__(self):
         return f"{self.ingredient.nom}"
-        " coûte " f"{self.prix} dans le "  f"{self.departement.numero}"
+        " coûte " f"{self.prix} dans le " f"{self.departement.numero}"
