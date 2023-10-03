@@ -36,15 +36,16 @@ class QuantiteIngredient(models.Model):
         return f"{self.ingredient.nom}" " : " f"{self.quantite}" "Kg"
 
     def cost(self, dep):
-        return self.quantite * self.ingredient.prix_set.get(
-            departement__numero=dep.numero
+        return (
+            self.quantite
+            * self.ingredient.prix_set.get(departement__numero=dep.numero).prix
         )
 
 
 class Action(models.Model):
     machine = models.ForeignKey(Machine, on_delete=models.PROTECT)
     commande = models.CharField(max_length=100)
-    durée = models.IntegerField()
+    duree = models.IntegerField()
     ingredient = models.ManyToManyField(QuantiteIngredient)
 
     def __str__(self):
@@ -80,12 +81,12 @@ class Usine(models.Model):
 
         return self.taille * self.departement.prix_m2 + prixStock + prixTotalMachine
 
-    def Achat_auto(self):
+    def Achat_auto(self, rece):
         # peut etre améliorée pour acheter uniquement les ingrédients manquants
-        for ingre_Recette in self.recette.action.ingredient.all():
+        for ingre_Recette in rece.action.ingredient.all():
             if self.stock.ingre_Recette.quantite < ingre_Recette.quantite:
                 # Achat d'ingrédients pour le stock
-                self.stock.add(ingre_Recette.quantite)
+                self.stock.add(QuantiteIngredient.object.create(ingre_Recette.quantite))
 
                 print("Achat ", ingre_Recette, " ", ingre_Recette.quantite, "Kg")
 

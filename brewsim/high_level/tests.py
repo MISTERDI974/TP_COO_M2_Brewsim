@@ -1,6 +1,15 @@
 from django.test import TestCase
 
-from .models import Departement, Ingredient, Machine, Prix, QuantiteIngredient, Usine
+from .models import (
+    Action,
+    Departement,
+    Ingredient,
+    Machine,
+    Prix,
+    QuantiteIngredient,
+    Recette,
+    Usine,
+)
 
 
 class MachineModelTests(TestCase):
@@ -9,6 +18,7 @@ class MachineModelTests(TestCase):
         self.assertEqual(Usine.objects.count(), 0)
         self.assertEqual(Ingredient.objects.count(), 0)
         self.assertEqual(Departement.objects.count(), 0)
+        self.assertEqual(Action.objects.count(), 0)
 
         four = Machine.objects.create(nom="four", prix=1000)
         Chemine = Machine.objects.create(nom="Chemine", prix=2000)
@@ -25,17 +35,34 @@ class MachineModelTests(TestCase):
         )
         Quant_orge_31 = QuantiteIngredient.objects.create(ingredient=orge, quantite=100)
 
+        Quant_orge_kaporal = Quant_orge_31
+        Quant_orge_kaporal.quantite = Quant_orge_kaporal.quantite / 2
+
+        Quant_houblon_kaporal = Quant_houblon_31
+        Quant_houblon_kaporal.quantite = Quant_houblon_kaporal.quantite / 5
+
+        cuire = Action.objects.create(machine=four, commande="cuire", duree=10)
+        cuire.ingredient.add(Quant_houblon_kaporal)
+        cuire.ingredient.add(Quant_orge_kaporal)
+
+        kaporal = Recette.objects.create(nom="Kaporal", action=cuire)
+
         factory = Usine.objects.create(departement=Haute_Garonne, taille=50)
 
         factory.machine.add(four)
         factory.machine.add(Chemine)
 
-        factory.stock.add(Quant_houblon_31)
-        factory.stock.add(Quant_orge_31)
+        # factory.stock.add(Quant_houblon_31)
+        # factory.stock.add(Quant_orge_31)
+
+        factory.recette.add(kaporal)
 
         self.assertEqual(Machine.objects.count(), 2)
         self.assertEqual(Usine.objects.count(), 1)
         self.assertEqual(Ingredient.objects.count(), 2)
         self.assertEqual(Departement.objects.count(), 1)
+        self.assertEqual(Action.objects.count(), 1)
+
+        # factory.Achat_auto()
 
         print("Cout usine =", factory.cost())
