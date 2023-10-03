@@ -53,8 +53,11 @@ class QuantiteIngredient(models.Model):
     def __str__(self):
         return f"{self.ingredient.nom}" " : " f"{self.quantite}" "Kg"
 
-    def cost(self, departement):
-        return self.quantite * self.ingredient.prix_set.get(departement.numero).prix
+    def cost(self, dep):
+        return (
+            self.quantite
+            * self.ingredient.prix_set.get(departement__numero=dep.numero).prix
+        )
 
 
 class Usine(models.Model):
@@ -70,10 +73,10 @@ class Usine(models.Model):
     def cost(self):
         prixTotalMachine = 0
         prixStock = 0
-        for mach in self.machine:
+        for mach in self.machine.all():
             prixTotalMachine = prixTotalMachine + mach.cost()
 
-        for ingre in self.stock:
+        for ingre in self.stock.all():
             prixStock = prixStock + ingre.cost(self.departement)
 
         return self.taille * self.departement.prix_m2 + prixStock + prixTotalMachine
