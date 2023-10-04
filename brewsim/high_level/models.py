@@ -12,6 +12,9 @@ class Departement(models.Model):
     def json(self):
         return {"numero ": self.numero, "prix_m2": self.prix_m2}
 
+    def json_extended(self):
+        return self.json()
+
 
 class Machine(models.Model):
     nom = models.CharField(max_length=100)
@@ -24,7 +27,10 @@ class Machine(models.Model):
         return self.prix
 
     def json(self):
-        return {"nom ": self.nom.id, "prix": self.prix}
+        return {"nom ": self.id, "prix": self.prix}
+
+    def json_extended(self):
+        return self.json()
 
 
 class Ingredient(models.Model):
@@ -34,7 +40,10 @@ class Ingredient(models.Model):
         return self.nom
 
     def json(self):
-        return {"nom ": self.nom.id}
+        return {"nom ": self.id}
+
+    def json_extended(self):
+        return self.json()
 
 
 class QuantiteIngredient(models.Model):
@@ -53,6 +62,9 @@ class QuantiteIngredient(models.Model):
     def json(self):
         return {"ingredient ": self.ingredient.id, "quantite": self.quantite}
 
+    def json_extended(self):
+        return self.json()
+
 
 class Action(models.Model):
     machine = models.ForeignKey(Machine, on_delete=models.PROTECT)
@@ -64,11 +76,27 @@ class Action(models.Model):
         return "Action : " f"{self.commande}"
 
     def json(self):
+        tabIng = []
+        for ing in self.ingredient.all():
+            tabIng.append(ing.id)
+
         return {
             "machine ": self.machine.id,
             "commande": self.commande,
             "duree ": self.duree,
-            "ingredient": self.ingredient.id,
+            "ingredient": tabIng,
+        }
+
+    def json_extended(self):
+        tabIng = []
+        for ing in self.ingredient.all():
+            tabIng.append(ing.json_extended())
+
+        return {
+            "machine ": self.machine.json_extended(),
+            "commande": self.commande,
+            "duree ": self.duree,
+            "ingredient": tabIng,
         }
 
 
@@ -80,7 +108,10 @@ class Recette(models.Model):
         return self.nom
 
     def json(self):
-        return {"nom ": self.nom.id, "action": self.action}
+        return {"nom ": self.id, "action": self.action.id}
+
+    def json_extended(self):
+        return self.json()
 
 
 class Usine(models.Model):
@@ -109,12 +140,12 @@ class Usine(models.Model):
         tabRec = []
         tabStock = []
 
-        for mach in self.machine.id:
-            tabMach.append(mach)
-        for rec in self.recette.id:
-            tabRec.append(mach)
-        for sto in self.stock.id:
-            tabStock.append(mach)
+        for mach in self.machine.all():
+            tabMach.append(mach.id)
+        for rec in self.recette.all():
+            tabRec.append(rec.id)
+        for sto in self.stock.all():
+            tabStock.append(sto.id)
         return {
             "departement ": self.departement.id,
             "taille": self.taille,
@@ -123,21 +154,42 @@ class Usine(models.Model):
             "stock": tabStock,
         }
 
+    def json_extended(self):
+        tabMach = []
+        tabRec = []
+        tabStock = []
+
+        for mach in self.machine.all():
+            tabMach.append(mach.json_extended())
+        for rec in self.recette.all():
+            tabRec.append(rec.json_extended())
+        for sto in self.stock.all():
+            tabStock.append(sto.json_extended())
+
+        return {
+            "departement ": self.departement.json_extended(),
+            "taille": self.taille,
+            "machine": tabMach,
+            "recette": tabRec,
+            "stock": tabStock,
+        }
+
     def Achat_auto(self, rece):
         # peut etre améliorée pour acheter uniquement les ingrédients manquants
-        print("debut achat auto")
         for ingre_Recette in rece.action.ingredient.all():
-            print("dans le 1 for : ", ingre_Recette)
-            print("STOCK : ", self.stock.all())
+            print("dans le 1 for : ", ingre_Recette.ingredient)
             for ingre_stock in self.stock.all():
-                print("dans le 2 for : ", ingre_stock)
-                if ingre_stock == ingre_Recette:
+                print("dans le 2 for : ", ingre_stock.ingredient)
+                if ingre_stock.ingredient == ingre_Recette.ingredient:
                     print("premier if")
                     if ingre_stock.quantite < ingre_Recette.quantite:
                         # Achat d'ingrédients pour le stock
                         print("second if")
                         self.stock.add(
-                            QuantiteIngredient.object.create(ingre_Recette.quantite)
+                            QuantiteIngredient.objects.create(
+                                ingredient=ingre_Recette.ingredient,
+                                quantite=ingre_Recette.quantite,
+                            )
                         )
 
                         print(
@@ -160,3 +212,11 @@ class Prix(models.Model):
             "departement": self.departement,
             "prix": self.prix,
         }
+
+    def json_extended(self):
+        return self.json()
+
+
+class Vente(models.Model):
+    departement = models.ForeignKey(Departement, on_delete=models.PROTECT)
+    benef = models.IntegerField()

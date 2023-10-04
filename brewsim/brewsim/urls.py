@@ -21,21 +21,23 @@ from high_level import views
 urlpatterns = [
     path("admin/", admin.site.urls),
     path(
-        "Departement/<int:pk>",
+        "departement/<int:pk>",
         views.DepartementDetailView.as_view(),
         name="departement",
     ),
-    path("Machine/<int:pk>", views.MachineDetailView.as_view(), name="machine"),
+    path("machine/<int:pk>", views.MachineDetailView.as_view(), name="machine"),
     path(
-        "Ingredient/<int:pk>", views.IngredientDetailView.as_view(), name="ingredient"
+        "ingredient/<int:pk>", views.IngredientDetailView.as_view(), name="ingredient"
     ),
     path(
-        "QuantiteIngredient/<int:pk>",
+        "quantiteingredient/<int:pk>",
         views.QuantiteIngredientDetailView.as_view(),
         name="quantiteingredient",
     ),
-    path("Action/<int:pk>", views.ActionDetailView.as_view(), name="action"),
-    path("Recette/<int:pk>", views.RecetteDetailView.as_view(), name="recette"),
-    path("Usine/<int:pk>", views.UsineDetailView.as_view(), name="usine"),
-    path("Prix/<int:pk>", views.PrixDetailView.as_view(), name="prix"),
+    path("action/<int:pk>", views.ActionDetailView.as_view(), name="action"),
+    path("recette/<int:pk>", views.RecetteDetailView.as_view(), name="recette"),
+    path("usine/<int:pk>", views.UsineDetailView.as_view(), name="usine"),
+    path("prix/<int:pk>", views.PrixDetailView.as_view(), name="prix"),
+    # path("api/<int:pk>", views.APIDetailView.as_view(), name="api"),
+    # path("vente/<int:pk>", views.VenteCreateView.as_view(), name="vente"),
 ]

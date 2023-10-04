@@ -71,6 +71,6 @@ class MachineModelTests(TestCase):
         self.assertEqual(Departement.objects.count(), 1)
         self.assertEqual(Action.objects.count(), 1)
 
-        # factory.Achat_auto(kaporal)
+        factory.Achat_auto(kaporal)
 
         print("Cout usine =", factory.cost())
