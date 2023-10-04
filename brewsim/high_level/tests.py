@@ -26,6 +26,11 @@ class MachineModelTests(TestCase):
         houblon = Ingredient.objects.create(nom="Houblon")
         orge = Ingredient.objects.create(nom="Orge")
 
+        Quant_orge_init = QuantiteIngredient.objects.create(ingredient=orge, quantite=0)
+        Quant_houblon_init = QuantiteIngredient.objects.create(
+            ingredient=houblon, quantite=0
+        )
+
         Haute_Garonne = Departement.objects.create(numero=31, prix_m2=2000)
         Prix.objects.create(ingredient=houblon, departement=Haute_Garonne, prix=20)
         Prix.objects.create(ingredient=orge, departement=Haute_Garonne, prix=10)
@@ -49,6 +54,9 @@ class MachineModelTests(TestCase):
 
         factory = Usine.objects.create(departement=Haute_Garonne, taille=50)
 
+        factory.stock.add(Quant_orge_init)
+        factory.stock.add(Quant_houblon_init)
+
         factory.machine.add(four)
         factory.machine.add(Chemine)
 
@@ -63,6 +71,6 @@ class MachineModelTests(TestCase):
         self.assertEqual(Departement.objects.count(), 1)
         self.assertEqual(Action.objects.count(), 1)
 
-        # factory.Achat_auto()
+        # factory.Achat_auto(kaporal)
 
         print("Cout usine =", factory.cost())
