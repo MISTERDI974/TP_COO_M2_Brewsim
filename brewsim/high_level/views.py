@@ -74,13 +74,13 @@ class PrixDetailView(DetailView):
         return HttpResponse(dumps(self.object.json_extended()))
 
 
-"""class APIDetailView(DetailView):
+class APIDetailView(DetailView):
     model = Departement
 
     def render_to_response(self, context, **response_kwargs):
-        return HttpResponse(
-            dumps (Departement.usine_set.get()) #A corriger
-        )"""
+        dico = self.object.json_extend().all()
+
+        return HttpResponse(dumps(dico))
 
 
 """@method_decorator(csrf_exempt, name="dispatch")
