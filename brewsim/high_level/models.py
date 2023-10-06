@@ -10,7 +10,7 @@ class Departement(models.Model):
         return "departement : " f"{self.numero}"
 
     def json(self):
-        return {"numero ": self.numero, "prix_m2": self.prix_m2}
+        return {"numero": self.numero, "prix_m2": self.prix_m2}
 
     def json_extended(self):
         return self.json()
@@ -27,7 +27,7 @@ class Machine(models.Model):
         return self.prix
 
     def json(self):
-        return {"nom ": self.id, "prix": self.prix}
+        return {"nom": self.nom, "prix": self.prix}
 
     def json_extended(self):
         return self.json()
@@ -40,7 +40,7 @@ class Ingredient(models.Model):
         return self.nom
 
     def json(self):
-        return {"nom ": self.id}
+        return {"nom": self.nom}
 
     def json_extended(self):
         return self.json()
@@ -51,7 +51,7 @@ class QuantiteIngredient(models.Model):
     quantite = models.IntegerField()
 
     def __str__(self):
-        return f"{self.ingredient.nom}" " : " f"{self.quantite}" "Kg"
+        return f"{self.ingredient.id}" " : " f"{self.quantite}" "Kg"
 
     def cost(self, dep):
         return (
@@ -60,7 +60,7 @@ class QuantiteIngredient(models.Model):
         )
 
     def json(self):
-        return {"ingredient ": self.ingredient.id, "quantite": self.quantite}
+        return {"ingredient": self.ingredient.id, "quantite": self.quantite}
 
     def json_extended(self):
         return self.json()
@@ -81,9 +81,9 @@ class Action(models.Model):
             tabIng.append(ing.id)
 
         return {
-            "machine ": self.machine.id,
+            "machine": self.machine.id,
             "commande": self.commande,
-            "duree ": self.duree,
+            "duree": self.duree,
             "ingredient": tabIng,
         }
 
@@ -93,9 +93,9 @@ class Action(models.Model):
             tabIng.append(ing.json_extended())
 
         return {
-            "machine ": self.machine.json_extended(),
+            "machine": self.machine.json_extended(),
             "commande": self.commande,
-            "duree ": self.duree,
+            "duree": self.duree,
             "ingredient": tabIng,
         }
 
@@ -108,7 +108,7 @@ class Recette(models.Model):
         return self.nom
 
     def json(self):
-        return {"nom ": self.id, "action": self.action.id}
+        return {"nom": self.id, "action": self.action.id}
 
     def json_extended(self):
         return self.json()
@@ -147,7 +147,7 @@ class Usine(models.Model):
         for sto in self.stock.all():
             tabStock.append(sto.id)
         return {
-            "departement ": self.departement.id,
+            "departement": self.departement.id,
             "taille": self.taille,
             "machine": tabMach,
             "recette": tabRec,
@@ -167,7 +167,7 @@ class Usine(models.Model):
             tabStock.append(sto.json_extended())
 
         return {
-            "departement ": self.departement.json_extended(),
+            "departement": self.departement.json_extended(),
             "taille": self.taille,
             "machine": tabMach,
             "recette": tabRec,
@@ -208,7 +208,7 @@ class Prix(models.Model):
 
     def json(self):
         return {
-            "ingredient ": self.ingredient.id,
+            "ingredient": self.ingredient.id,
             "departement": self.departement,
             "prix": self.prix,
         }
