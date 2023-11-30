@@ -80,21 +80,25 @@ class QuantiteIngredient{
 		}
 };
 
-
 class Action{
 	unique_ptr<Machine> machine_;
 	string commande_;
 	int duree_;
 	vector<unique_ptr<Ingredient>> ingredient_;
+	unique_ptr<Action> action_;
 
 	public:
 		Action(int id){
 			string url = "http://localhost:8000/action/" + to_string(id);
+			std::cout <<   url << "\n";
 			cpr::Response r = cpr::Get(cpr::Url{url});
 			json data = json::parse(r.text);
 			machine_ = make_unique<Machine>(data["machine"]);
 			commande_ = data["commande"];
 			duree_ = data["duree"];
+			action_ = make_unique<Action>(data["action"]);
+
+		//	cout <<  data <<endl;
 
 			for(const auto &i : data["ingredient"])
 			{
@@ -109,8 +113,9 @@ class Action{
 			out << *p.machine_ << " / " << p.commande_ <<" / " << p.duree_  <<" / ";
 			for (const auto &i : p.ingredient_)
 			{
-				out << *i;
+				out << *i << " , ";
 			}
+
 			return out;
 		}
 };
@@ -128,9 +133,9 @@ class Recette{
 			action_ = make_unique<Action>(data["action"]);
 		};
 
-		/*friend ostream& operator<<(ostream& out, const Recette& p){
-			return out << p.nom_ << " / " << p.action_;
-		}*/
+		friend ostream& operator<<(ostream& out, const Recette& p){
+			return out << p.nom_ << " / " << p.nom_;
+		}
 };
 
 
@@ -149,7 +154,7 @@ class Usine{
 			json data = json::parse(r.text);
 			nom_ = data["nom"];
 			taille_ = data["taille"];
-			machine_ = make_unique<Action>(data["machine"]);
+			machine_ = make_unique<Action>(data["machine"]);"""
 			recette_ = make_unique<Action>(data["recette"]);
 			stock_ = make_unique<Action>(data["stock"]);
 		};*/
@@ -167,10 +172,11 @@ class Prix{
 int main(void)
 {
 	//Ingredient a(1);
-//// 	QuantiteIngredient b(1);
+//	QuantiteIngredient b(1);
+		//Recette b(1);
 	Action c(1);
 //	cout << a << endl;
-//	cout << b << endl;
+	//cout << b << endl;
 cout << c << endl;
 	return 0;
 }

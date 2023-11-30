@@ -69,6 +69,7 @@ class QuantiteIngredient(models.Model):
 class Action(models.Model):
     machine = models.ForeignKey(Machine, on_delete=models.PROTECT)
     commande = models.CharField(max_length=100)
+    action = models.ForeignKey("self", on_delete=models.PROTECT, related_name="+",null = True, blank = True)
     duree = models.IntegerField()
     ingredient = models.ManyToManyField(QuantiteIngredient)
 
@@ -77,15 +78,34 @@ class Action(models.Model):
 
     def json(self):
         tabIng = []
+        tabIngredient=[]
+        tabAct_machine = []
+        tabAct_commande = []
+        tabAct_duree = []
+        tabAct_ingredient = []
         for ing in self.ingredient.all():
             tabIng.append(ing.id)
 
-        return {
-            "machine": self.machine.id,
-            "commande": self.commande,
-            "duree": self.duree,
-            "ingredient": tabIng,
-        }
+
+        if self.action != None:
+            action = self.action.id
+            return {
+
+                    "machine": self.machine.id,
+                    "commande": self.commande,
+                    "ingredient": tabIng,
+                    "duree": self.duree,
+                    "action": action,
+                }
+        else:
+            return {
+
+                    "machine": self.machine.id,
+                    "commande": self.commande,
+                    "ingredient": tabIng,
+                    "duree": self.duree,
+                }
+
 
     def json_extended(self):
         tabIng = []
@@ -108,7 +128,7 @@ class Recette(models.Model):
         return self.nom
 
     def json(self):
-        return {"nom": self.id, "action": self.action.id}
+        return {"nom": self.nom, "action": self.action.id}
 
     def json_extended(self):
         return self.json()
